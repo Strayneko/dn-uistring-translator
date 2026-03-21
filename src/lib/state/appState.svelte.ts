@@ -46,6 +46,9 @@ export class AppState {
 	/** Number of files that finished successfully. */
 	readonly doneCount = $derived(this.xmlFiles.filter((f) => f.status === 'done').length);
 
+	/** Number of files that failed with an error. */
+	readonly errorCount = $derived(this.xmlFiles.filter((f) => f.status === 'error').length);
+
 	/** Total number of validated XML files in the current session. */
 	readonly totalCount = $derived(this.xmlFiles.length);
 
