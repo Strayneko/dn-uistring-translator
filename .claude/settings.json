@@ -6,5 +6,20 @@
         "repo": "anthropics/claude-plugins-official"
       }
     }
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "agent",
+            "prompt": "Inspect the bash tool input in $ARGUMENTS. If the command contains 'git commit', update CLAUDE.md at the project root: (1) refresh the '### Source layout' code block to match the actual current src/ directory tree, (2) rewrite the '### Current state' bullet points to reflect what was just committed — use 'git log --oneline -3' to understand recent changes. Keep every other section of CLAUDE.md exactly as-is. If the command was not a git commit, do nothing.",
+            "timeout": 120,
+            "statusMessage": "Updating CLAUDE.md..."
+          }
+        ]
+      }
+    ]
   }
 }
