@@ -1,13 +1,31 @@
 <script lang="ts">
+	import { SvelteMap } from 'svelte/reactivity';
+	import JSZip from 'jszip';
+
 	type XmlFile = {
 		name: string;
 		lines: number;
+		totalStrings: number;
+		translatedStrings: number;
 		status: 'pending' | 'in-progress' | 'done' | 'error';
+		errorMsg?: string;
 	};
+
+	interface TranslationItem {
+		id: number;
+		text: string;
+	}
+
+	const BATCH_SIZE = 100;
 
 	let folderPath = $state('');
 	let xmlFiles = $state<XmlFile[]>([]);
 	let translating = $state(false);
+
+	// Stores final translated XML per file — only read on download
+	const translatedContents = new SvelteMap<string, string>();
+
+	let fileMap = new SvelteMap<string, File>();
 
 	// Confirmation dialog state
 	let pendingFiles = $state<FileList | null>(null);
@@ -17,7 +35,7 @@
 
 	const statusConfig = {
 		pending: { label: 'Pending', class: 'bg-slate-700 text-slate-300' },
-		'in-progress': { label: 'In Progress', class: 'bg-blue-700 text-blue-200 animate-pulse' },
+		'in-progress': { label: 'In Progress', class: 'bg-blue-700 text-blue-200' },
 		done: { label: 'Done', class: 'bg-emerald-800 text-emerald-300' },
 		error: { label: 'Error', class: 'bg-red-900 text-red-300' },
 	};
@@ -25,10 +43,50 @@
 	let doneCount = $derived(xmlFiles.filter((f) => f.status === 'done').length);
 	let totalCount = $derived(xmlFiles.length);
 	let overallProgress = $derived(totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0);
+	let allDone = $derived(totalCount > 0 && !translating && xmlFiles.every((f) => f.status === 'done' || f.status === 'error'));
+	let hasSuccessful = $derived(xmlFiles.some((f) => f.status === 'done'));
+	let zipFolderName = $derived(folderPath.split(/[/\\]/).filter(Boolean).at(-1) ?? 'translated');
 
 	function isValidXml(content: string): boolean {
 		const doc = new DOMParser().parseFromString(content, 'text/xml');
 		return doc.querySelector('parsererror') === null;
+	}
+
+	function extractCdata(xml: string): TranslationItem[] {
+		const items: TranslationItem[] = [];
+		const regex = /<!\[CDATA\[([\s\S]*?)\]\]>/g;
+		let match;
+		let id = 0;
+		while ((match = regex.exec(xml)) !== null) {
+			items.push({ id, text: match[1] });
+			id++;
+		}
+		return items;
+	}
+
+	function substituteCdata(xml: string, translations: TranslationItem[]): string {
+		let result = xml;
+		let offset = 0;
+		const regex = /<!\[CDATA\[([\s\S]*?)\]\]>/g;
+		const matches: Array<{ index: number; length: number; id: number }> = [];
+		let match;
+		let id = 0;
+		while ((match = regex.exec(xml)) !== null) {
+			matches.push({ index: match.index, length: match[0].length, id });
+			id++;
+		}
+		for (const m of matches) {
+			const t = translations.find((x) => x.id === m.id);
+			if (!t) continue;
+			const replacement = `<![CDATA[${t.text}]]>`;
+			result = result.slice(0, m.index + offset) + replacement + result.slice(m.index + offset + m.length);
+			offset += replacement.length - m.length;
+		}
+		return result;
+	}
+
+	function updateFile(name: string, patch: Partial<XmlFile>) {
+		xmlFiles = xmlFiles.map((f) => (f.name === name ? { ...f, ...patch } : f));
 	}
 
 	function handleFolderSelect(e: Event) {
@@ -61,24 +119,98 @@
 
 		folderPath = pendingFolderName;
 		translating = true;
+		translatedContents.clear();
+		fileMap = new SvelteMap();
 		xmlFiles = [];
 
+		// Scan and validate
 		const candidates = Array.from(pendingFiles).filter((f) =>
 			f.name.toLowerCase().endsWith('.xml')
 		);
-
-		const results: XmlFile[] = [];
+		const scanned: XmlFile[] = [];
 		for (const file of candidates) {
 			const content = await file.text();
 			if (!isValidXml(content)) continue;
-			const lines = content.split('\n').length;
-			results.push({ name: file.name, lines, status: 'pending' });
+			const items = extractCdata(content);
+			scanned.push({
+				name: file.name,
+				lines: content.split('\n').length,
+				totalStrings: items.length,
+				translatedStrings: 0,
+				status: 'pending'
+			});
+			fileMap.set(file.name, file);
+		}
+		scanned.sort((a, b) => a.name.localeCompare(b.name));
+		xmlFiles = scanned;
+		pendingFiles = null;
+
+		// Translate each file sequentially
+		for (const entry of xmlFiles) {
+			const file = fileMap.get(entry.name);
+			if (!file) continue;
+
+			updateFile(entry.name, { status: 'in-progress', translatedStrings: 0 });
+
+			try {
+				const xml = await file.text();
+				const allItems = extractCdata(xml);
+
+				// No translatable strings — copy as-is
+				if (allItems.length === 0) {
+					translatedContents.set(entry.name, xml);
+					updateFile(entry.name, { status: 'done' });
+					continue;
+				}
+
+				const allTranslations: TranslationItem[] = [];
+
+				// Send in batches, updating progress after each
+				for (let i = 0; i < allItems.length; i += BATCH_SIZE) {
+					const batch = allItems.slice(i, i + BATCH_SIZE);
+
+					const res = await fetch('/api/translate', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ items: batch, filename: entry.name })
+					});
+
+					if (!res.ok) {
+						const body = await res.json().catch(() => ({ message: res.statusText }));
+						throw new Error(body?.message ?? res.statusText);
+					}
+
+					const { items: translated } = await res.json();
+					allTranslations.push(...translated);
+
+					updateFile(entry.name, { translatedStrings: allTranslations.length });
+				}
+
+				const translatedXml = substituteCdata(xml, allTranslations);
+				translatedContents.set(entry.name, translatedXml);
+				updateFile(entry.name, { status: 'done', translatedStrings: allItems.length });
+			} catch (e) {
+				const msg = (e as Error).message;
+				console.error(`[${entry.name}]`, msg);
+				updateFile(entry.name, { status: 'error', errorMsg: msg });
+			}
 		}
 
-		results.sort((a, b) => a.name.localeCompare(b.name));
-		xmlFiles = results;
 		translating = false;
-		pendingFiles = null;
+	}
+
+	async function downloadZip() {
+		const zip = new JSZip();
+		for (const [name, content] of translatedContents) {
+			zip.file(name, content);
+		}
+		const blob = await zip.generateAsync({ type: 'blob' });
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = `${zipFolderName}.zip`;
+		a.click();
+		URL.revokeObjectURL(url);
 	}
 </script>
 
@@ -91,7 +223,6 @@
 		aria-labelledby="confirm-title"
 	>
 		<div class="w-full max-w-md mx-4 bg-[#0d2137] border border-blue-800/60 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden">
-			<!-- Dialog header -->
 			<div class="px-6 pt-6 pb-4 border-b border-blue-900/40">
 				<div class="flex items-start gap-4">
 					<div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0 mt-0.5">
@@ -105,8 +236,6 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- Folder details -->
 			<div class="px-6 py-4 space-y-3">
 				<div class="bg-[#07111f] border border-blue-900/50 rounded-lg px-4 py-3">
 					<p class="text-xs text-slate-500 mb-1">Folder path</p>
@@ -123,8 +252,6 @@
 					{/if}
 				</div>
 			</div>
-
-			<!-- Actions -->
 			<div class="px-6 pb-6 flex gap-3 justify-end">
 				<button
 					onclick={cancelTranslate}
@@ -158,7 +285,7 @@
 			</div>
 			<div>
 				<h1 class="text-lg font-semibold text-white">XML String Translator</h1>
-				<p class="text-xs text-slate-400">Powered by Claude AI</p>
+				<p class="text-xs text-slate-400">Powered by Google Translate</p>
 			</div>
 		</div>
 	</header>
@@ -167,8 +294,6 @@
 		<!-- Controls -->
 		<div class="bg-[#0d2137] border border-blue-900/50 rounded-xl p-6 space-y-5">
 			<h2 class="text-sm font-semibold text-blue-300 uppercase tracking-wider">Configuration</h2>
-
-			<!-- Folder selector -->
 			<div class="space-y-2">
 				<label for="folder-input" class="block text-sm text-slate-300">Source Folder</label>
 				<div class="flex gap-3">
@@ -216,10 +341,7 @@
 				<div class="px-6 py-3 border-b border-blue-900/30 bg-[#091a2e]">
 					<div class="flex items-center gap-3">
 						<div class="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-							<div
-								class="h-full bg-blue-500 rounded-full transition-all duration-500"
-								style="width: {overallProgress}%"
-							></div>
+							<div class="h-full bg-blue-500 rounded-full transition-all duration-500" style="width: {overallProgress}%"></div>
 						</div>
 						<span class="text-xs text-slate-400 w-10 text-right">{overallProgress}%</span>
 					</div>
@@ -227,15 +349,7 @@
 			{/if}
 
 			<!-- File rows -->
-			{#if translating}
-				<div class="flex flex-col items-center justify-center py-16 text-slate-400">
-					<svg class="w-8 h-8 mb-3 animate-spin text-blue-500" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-						<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
-					</svg>
-					<p class="text-sm">Translating...</p>
-				</div>
-			{:else if xmlFiles.length === 0}
+			{#if xmlFiles.length === 0}
 				<div class="flex flex-col items-center justify-center py-16 text-slate-500">
 					<svg class="w-12 h-12 mb-3 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
 						<path stroke-linecap="round" stroke-linejoin="round" d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V7z" />
@@ -243,7 +357,14 @@
 					<p class="text-sm">{folderPath ? 'No valid XML files found in this folder' : 'Select a folder to see XML files'}</p>
 				</div>
 			{:else}
-				<ul class="divide-y divide-blue-900/30">
+				<ul
+				class="divide-y divide-blue-900/30 max-h-104 overflow-y-auto
+					[&::-webkit-scrollbar]:w-1.5
+					[&::-webkit-scrollbar-track]:bg-[#07111f]
+					[&::-webkit-scrollbar-thumb]:bg-blue-800
+					[&::-webkit-scrollbar-thumb]:rounded-full
+					[&::-webkit-scrollbar-thumb:hover]:bg-blue-600"
+			>
 					{#each xmlFiles as file (file.name)}
 						<li class="flex items-center gap-4 px-6 py-4 hover:bg-blue-900/10 transition-colors">
 							<div class="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0">
@@ -251,16 +372,50 @@
 									<path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
 								</svg>
 							</div>
+
 							<div class="flex-1 min-w-0">
 								<p class="text-sm font-medium text-slate-100 truncate">{file.name}</p>
-								<p class="text-xs text-slate-500 mt-0.5">{file.lines.toLocaleString()} lines</p>
+
+								{#if file.status === 'error' && file.errorMsg}
+									<p class="text-xs text-red-400 mt-0.5 truncate" title={file.errorMsg}>{file.errorMsg}</p>
+								{:else if file.status === 'in-progress' && file.totalStrings > 0}
+									<div class="flex items-center gap-2 mt-1.5">
+										<div class="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+											<div
+												class="h-full bg-blue-500 rounded-full transition-all duration-300"
+												style="width: {Math.round((file.translatedStrings / file.totalStrings) * 100)}%"
+											></div>
+										</div>
+										<span class="text-xs text-slate-400 shrink-0">
+											{file.translatedStrings} / {file.totalStrings} strings
+										</span>
+									</div>
+								{:else}
+									<p class="text-xs text-slate-500 mt-0.5">{file.lines.toLocaleString()} lines</p>
+								{/if}
 							</div>
+
 							<span class="text-xs font-medium px-2.5 py-1 rounded-full shrink-0 {statusConfig[file.status].class}">
 								{statusConfig[file.status].label}
 							</span>
 						</li>
 					{/each}
 				</ul>
+
+				<!-- Download ZIP -->
+				{#if allDone && hasSuccessful}
+					<div class="px-6 py-4 border-t border-blue-900/40 flex justify-end">
+						<button
+							onclick={downloadZip}
+							class="inline-flex items-center gap-2 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors shadow-lg shadow-emerald-900/30"
+						>
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+							</svg>
+							Download ZIP — {zipFolderName}.zip
+						</button>
+					</div>
+				{/if}
 			{/if}
 		</div>
 	</main>
