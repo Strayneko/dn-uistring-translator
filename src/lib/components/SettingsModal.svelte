@@ -7,7 +7,7 @@
 		canClose: boolean;
 		currentProvider: string;
 		currentApiKey: string;
-		onSave: (provider: string, apiKey: string) => void;
+		onSave: (provider: string, apiKey: string) => Promise<string | null>;
 		onClose: () => void;
 	}
 
@@ -16,6 +16,8 @@
 	let provider = $state('');
 	let apiKey = $state('');
 	let showKey = $state(false);
+	let saving = $state(false);
+	let errorMsg = $state('');
 
 	// Sync form values from props whenever the modal opens
 	$effect(() => {
@@ -23,6 +25,7 @@
 			provider = currentProvider;
 			apiKey = currentApiKey;
 			showKey = false;
+			errorMsg = '';
 		}
 	});
 
@@ -43,9 +46,13 @@
 		if (canClose) onClose();
 	}
 
-	function handleSave() {
-		if (!canSave) return;
-		onSave(provider, apiKey.trim());
+	async function handleSave() {
+		if (!canSave || saving) return;
+		saving = true;
+		errorMsg = '';
+		const err = await onSave(provider, apiKey.trim());
+		saving = false;
+		if (err) errorMsg = err;
 	}
 </script>
 
@@ -167,17 +174,30 @@
 			</div>
 
 			<!-- Footer -->
-			<div class="px-6 pb-6 flex justify-end">
-				<button
-					onclick={handleSave}
-					disabled={!canSave}
-					class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
-				>
-					<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-						<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-					</svg>
-					Save
-				</button>
+			<div class="px-6 pb-6 space-y-3">
+				{#if errorMsg}
+					<p class="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">{errorMsg}</p>
+				{/if}
+				<div class="flex justify-end">
+					<button
+						onclick={handleSave}
+						disabled={!canSave || saving}
+						class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
+					>
+						{#if saving}
+							<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+								<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+								<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+							</svg>
+							Validating…
+						{:else}
+							<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+								<path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+							</svg>
+							Save
+						{/if}
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>

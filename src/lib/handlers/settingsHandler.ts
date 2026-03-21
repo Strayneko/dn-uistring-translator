@@ -16,13 +16,31 @@ export function createSettingsHandlers(state: AppState) {
 	}
 
 	/**
-	 * Persists the chosen provider and API key, then closes the modal.
+	 * Validates the API key against the translate endpoint, then persists
+	 * the provider and key if valid.
 	 *
 	 * @param provider  Provider identifier (e.g. `'google'`).
 	 * @param apiKey    The user's API key for the chosen provider.
+	 * @returns `null` on success, or an error message string on failure.
 	 */
-	function handleSaveSettings(provider: string, apiKey: string): void {
+	async function handleSaveSettings(provider: string, apiKey: string): Promise<string | null> {
+		try {
+			const res = await fetch('/api/translate', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ items: [{ id: 1, text: 'test' }], filename: 'validation', apiKey }),
+			});
+
+			if (!res.ok) {
+				const body = await res.json().catch(() => null);
+				return body?.message ?? res.statusText;
+			}
+		} catch {
+			return 'Could not reach the translation service. Check your connection.';
+		}
+
 		state.saveSettings(provider, apiKey);
+		return null;
 	}
 
 	return { handleOpenSettings, handleSaveSettings };
