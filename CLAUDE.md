@@ -41,19 +41,17 @@ src/
 │   └── server/
 │       └── translate/
 │           ├── types.ts                  — TranslationProvider interface, TranslationItem (server)
-│           ├── index.ts                  — getProvider() factory
-│           ├── google.ts                 — Google Translate v2 REST, batched at 100
-│           ├── anthropic.ts              — Claude Haiku provider
-│           └── openai.ts                 — GPT-4o-mini provider
+│           ├── index.ts                  — getProvider(apiKey) returns GoogleTranslateProvider
+│           └── google.ts                 — Google Translate v2 REST, batched at 100
 └── routes/
     ├── +page.svelte                      — state wiring only (new AppState + 3 handler factories)
     └── api/translate/
-        └── +server.ts                    — POST endpoint, delegates to active provider
+        └── +server.ts                    — POST endpoint, calls getProvider with GOOGLE_TRANSLATE_API_KEY
 ```
 
 ### Architecture
 
-**`+page.svelte`** is a pure orchestrator — 18 lines of script, no logic:
+**`+page.svelte`** is a pure orchestrator — ~18 lines of script, no logic:
 ```ts
 const state = new AppState();
 const { handleFolderSelect, handleCancel } = createFolderHandlers(state);
@@ -61,23 +59,29 @@ const { handleConfirm } = createTranslateHandler(state);
 const { handleDownload } = createDownloadHandler(state);
 ```
 
-**Translation provider pattern** — swap providers via `TRANSLATION_PROVIDER` env var:
-- `google` (default) — Google Translate v2 REST API
-- `anthropic` — Claude Haiku
-- `openai` — GPT-4o-mini
+**`AppState`** (`src/lib/state/appState.svelte.ts`) — Svelte 5 reactive class holding:
+- `$state`: `folderPath`, `xmlFiles`, `translating`, `fileMap`, `translatedContents`, dialog state
+- `$derived`: `doneCount`, `errorCount`, `totalCount`, `overallProgress`, `allDone`, `hasSuccessful`, `zipFolderName`
+- Method: `updateFile(name, patch)`
+
+**Translation** — Google Translate v2 REST API only:
+- `getProvider(apiKey)` in `index.ts` returns a `GoogleTranslateProvider`
+- Batches at 100 items per request (API limit)
+- Frontend sends batches and updates per-file progress after each response
 
 **API endpoint**: `POST /api/translate`
 - Accepts `{ items: TranslationItem[], filename: string }`
 - Returns `{ items: TranslationItem[] }`
 - `TranslationItem = { id: number, text: string }`
-- Frontend batches at 100 items (Google Translate limit); server also batches internally
+
+**File list header** shows three live counters:
+- `X translated` (green) — files with `status === 'done'`
+- `X error(s)` (red) — only shown when `errorCount > 0`
+- `X total` (grey) — all validated files
 
 ### Key env vars (see `.env.example`)
 ```
-TRANSLATION_PROVIDER="google"   # google | anthropic | openai
 GOOGLE_TRANSLATE_API_KEY=""
-CLAUDE_API_KEY=""
-OPENAI_API_KEY=""
 ```
 
 ### Commit conventions
@@ -88,7 +92,8 @@ OPENAI_API_KEY=""
 
 ### Current state
 - All core features complete and working
-- Codebase fully refactored into SOLID components, handlers, state, and utilities
+- Codebase fully refactored: SOLID components, typed handlers, reactive state class, pure XML utilities
+- LLM providers (Anthropic, OpenAI) fully removed — Google Translate only
 - No pending tasks
 
 ---
