@@ -6,6 +6,7 @@
 		files: XmlFile[];
 		folderPath: string;
 		doneCount: number;
+		errorCount: number;
 		totalCount: number;
 		overallProgress: number;
 		allDone: boolean;
@@ -18,6 +19,7 @@
 		files,
 		folderPath,
 		doneCount,
+		errorCount,
 		totalCount,
 		overallProgress,
 		allDone,
@@ -36,7 +38,19 @@
 				{totalCount} files
 			</span>
 		</div>
-		<span class="text-sm text-slate-400">{doneCount} / {totalCount} translated</span>
+		<div class="flex items-center gap-2 text-xs">
+			<span class="px-2 py-0.5 rounded-full bg-emerald-900/50 text-emerald-400">
+				{doneCount} translated
+			</span>
+			{#if errorCount > 0}
+				<span class="px-2 py-0.5 rounded-full bg-red-900/50 text-red-400">
+					{errorCount} error{errorCount === 1 ? '' : 's'}
+				</span>
+			{/if}
+			<span class="px-2 py-0.5 rounded-full bg-slate-700/60 text-slate-400">
+				{totalCount} total
+			</span>
+		</div>
 	</div>
 
 	<!-- Overall progress bar -->
