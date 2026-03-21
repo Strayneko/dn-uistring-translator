@@ -2,18 +2,12 @@ import { env } from '$env/dynamic/private';
 import { json, error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { getProvider } from '$lib/server/translate';
-import type { ProviderName, TranslationItem } from '$lib/server/translate';
+import type { TranslationItem } from '$lib/server/translate';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const providerName = (env.TRANSLATION_PROVIDER ?? 'google') as ProviderName;
-
 	let provider;
 	try {
-		provider = getProvider(providerName, {
-			googleApiKey: env.GOOGLE_TRANSLATE_API_KEY,
-			claudeApiKey: env.CLAUDE_API_KEY,
-			openaiApiKey: env.OPENAI_API_KEY
-		});
+		provider = getProvider(env.GOOGLE_TRANSLATE_API_KEY ?? '');
 	} catch (e) {
 		console.error('Provider init failed:', e);
 		error(500, (e as Error).message);
