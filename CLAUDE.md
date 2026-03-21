@@ -43,8 +43,9 @@ src/
 │   └── server/
 │       └── translate/
 │           ├── types.ts                  — TranslationProvider interface, TranslationItem (server)
-│           ├── index.ts                  — getProvider(apiKey) returns GoogleTranslateProvider
-│           └── google.ts                 — Google Translate v2 REST, batched at 100
+│           ├── index.ts                  — getProvider(provider, apiKey) routes to correct provider
+│           ├── google.ts                 — Google Translate v2 REST, batched at 100
+│           └── deepl.ts                  — DeepL v2 REST, batched at 50; auto-detects free/paid endpoint
 └── routes/
     ├── +page.svelte                      — state wiring only (new AppState + 4 handler factories)
     └── api/translate/
@@ -73,14 +74,15 @@ const { handleOpenSettings, handleSaveSettings } = createSettingsHandlers(state)
 - On save: `handleSaveSettings` sends a test request to `/api/translate`; only calls `state.saveSettings()` if the key is valid
 - `SettingsModal` shows spinner + "Validating…" during check; red error banner if rejected
 
-**Translation** — Google Translate v2 REST API only:
-- `getProvider(apiKey)` in `index.ts` returns a `GoogleTranslateProvider`
-- Batches at 100 items per request (API limit)
-- Frontend sends batches and updates per-file progress after each response
-- `apiKey` comes from request body (no server-side env var required)
+**Translation** — two providers supported:
+- `getProvider(provider, apiKey)` in `index.ts` routes to `GoogleTranslateProvider` or `DeepLProvider`
+- Google: batches at 100 items/request
+- DeepL: batches at 50 items/request; free-tier keys end with `:fx` and use `api-free.deepl.com`
+- `apiKey` and `provider` come from request body (no server-side env var required)
+- Switching provider in the settings modal resets the API key field
 
 **API endpoint**: `POST /api/translate`
-- Accepts `{ items: TranslationItem[], filename: string, apiKey: string }`
+- Accepts `{ items: TranslationItem[], filename: string, apiKey: string, provider: string }`
 - Returns `{ items: TranslationItem[] }`
 - `TranslationItem = { id: number, text: string }`
 
@@ -102,7 +104,8 @@ GOOGLE_TRANSLATE_API_KEY=""   # optional — key now comes from client localStor
 
 ### Current state
 - All core features complete and working
-- Per-user API key stored in localStorage; validated against the API on save
+- Two translation providers: Google Translate and DeepL
+- Per-user API key stored in localStorage; validated against the API on save; resets when provider is switched
 - Settings modal: unclosable on first run, reopenable via header button
 - Folder selector supports click-to-browse and drag-and-drop
 - Codebase fully refactored: SOLID components, typed handlers, reactive state class, pure XML utilities
