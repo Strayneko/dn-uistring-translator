@@ -6,6 +6,60 @@
 
 ---
 
+## Project: XML String Translator
+
+A SvelteKit web app that translates Chinese CDATA strings inside XML files to English using Google Translate API. Built with a dark blue theme.
+
+### What it does
+1. User selects a folder via `webkitdirectory` file input
+2. A custom themed confirmation modal appears showing folder path + XML file count
+3. On confirm: scans and validates XML files, then translates them sequentially
+4. Each file's CDATA sections are extracted, sent to Google Translate in batches of 100, substituted back
+5. Per-file progress bar shows "X / Y strings" during translation
+6. After all files complete, a "Download ZIP" button appears — downloads all translated XMLs as `<folderName>.zip`
+
+### Architecture
+
+**Translation provider pattern** — swap providers via `TRANSLATION_PROVIDER` env var:
+- `google` (default) — Google Translate v2 REST API (`src/lib/server/translate/google.ts`)
+- `anthropic` — Claude Haiku (`src/lib/server/translate/anthropic.ts`)
+- `openai` — GPT-4o-mini (`src/lib/server/translate/openai.ts`)
+- Interface: `TranslationProvider` in `src/lib/server/translate/types.ts`
+- Factory: `getProvider()` in `src/lib/server/translate/index.ts`
+
+**API endpoint**: `POST /api/translate` (`src/routes/api/translate/+server.ts`)
+- Accepts `{ items: TranslationItem[], filename: string }`
+- Returns `{ items: TranslationItem[] }`
+- `TranslationItem = { id: number, text: string }`
+
+**Frontend** (`src/routes/+page.svelte`):
+- `SvelteMap` for `fileMap` (File objects) and `translatedContents` (translated XML strings)
+- `BATCH_SIZE = 100` — sends 100 CDATA items per API call (Google Translate limit)
+- `extractCdata(xml)` — extracts all `<![CDATA[...]]>` as `TranslationItem[]`
+- `substituteCdata(xml, translations)` — substitutes translated items back
+- `XmlFile` type: `{ name, lines, totalStrings, translatedStrings, status, errorMsg? }`
+- Status values: `pending | in-progress | done | error`
+- File list is scrollable (`max-h-104`) with custom dark blue scrollbar
+
+### Key env vars (see `.env.example`)
+```
+TRANSLATION_PROVIDER="google"   # google | anthropic | openai
+GOOGLE_TRANSLATE_API_KEY=""
+CLAUDE_API_KEY=""
+OPENAI_API_KEY=""
+```
+
+### Commit conventions
+- Simple, descriptive messages — `feat:`, `fix:`, `chore:`
+- One commit per file or logical group
+- No co-author attribution
+
+### Current state (as of last session)
+- All core features complete and working
+- No pending tasks
+
+---
+
 You are able to use the Svelte MCP server, where you have access to comprehensive Svelte 5 and SvelteKit documentation. Here's how to use the available tools effectively:
 
 ## Available MCP Tools:
