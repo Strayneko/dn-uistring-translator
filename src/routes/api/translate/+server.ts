@@ -4,10 +4,11 @@ import { getProvider } from '$lib/server/translate';
 import type { TranslationItem } from '$lib/server/translate';
 
 export const POST: RequestHandler = async ({ request }) => {
-	const { items, filename, apiKey } = await request.json() as {
+	const { items, filename, apiKey, provider: providerName = 'google' } = await request.json() as {
 		items: TranslationItem[];
 		filename: string;
 		apiKey: string;
+		provider?: string;
 	};
 
 	if (!apiKey) {
@@ -16,7 +17,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
 	let provider;
 	try {
-		provider = getProvider(apiKey);
+		provider = getProvider(providerName, apiKey);
 	} catch (e) {
 		console.error('Provider init failed:', e);
 		error(500, (e as Error).message);

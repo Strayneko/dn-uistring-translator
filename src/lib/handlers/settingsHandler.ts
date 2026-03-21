@@ -28,7 +28,7 @@ export function createSettingsHandlers(state: AppState) {
 			const res = await fetch('/api/translate', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ items: [{ id: 1, text: 'test' }], filename: 'validation', apiKey }),
+				body: JSON.stringify({ items: [{ id: 1, text: 'test' }], filename: 'validation', apiKey, provider }),
 			});
 
 			if (!res.ok) {

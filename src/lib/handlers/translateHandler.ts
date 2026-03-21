@@ -85,7 +85,7 @@ export function createTranslateHandler(state: AppState) {
 					const res = await fetch('/api/translate', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ items: batch, filename: entry.name, apiKey: state.apiKey }),
+						body: JSON.stringify({ items: batch, filename: entry.name, apiKey: state.apiKey, provider: state.provider }),
 					});
 
 					if (!res.ok) {

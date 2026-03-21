@@ -1,5 +1,8 @@
 <script lang="ts">
-	const PROVIDERS = [{ value: 'google', label: 'Google Translate' }] as const;
+	const PROVIDERS = [
+		{ value: 'google', label: 'Google Translate' },
+		{ value: 'deepl', label: 'DeepL' },
+	] as const;
 
 	interface Props {
 		show: boolean;
@@ -29,6 +32,12 @@
 		}
 	});
 
+	function handleProviderChange(e: Event) {
+		provider = (e.target as HTMLSelectElement).value;
+		apiKey = '';
+		errorMsg = '';
+	}
+
 	const canSave = $derived(apiKey.trim().length > 0);
 
 	const providerLabels: Record<string, { name: string; keyLabel: string; keyPlaceholder: string }> =
@@ -37,6 +46,11 @@
 				name: 'Google Translate',
 				keyLabel: 'Google Translate API Key',
 				keyPlaceholder: 'AIza...',
+			},
+			deepl: {
+				name: 'DeepL',
+				keyLabel: 'DeepL API Key',
+				keyPlaceholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx',
 			},
 		};
 
@@ -127,7 +141,8 @@
 					<label for="provider-select" class="block text-sm text-slate-300">Provider</label>
 					<select
 						id="provider-select"
-						bind:value={provider}
+						value={provider}
+						onchange={handleProviderChange}
 						class="w-full bg-[#07111f] border border-blue-900/60 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
 					>
 						{#each PROVIDERS as p (p.value)}
