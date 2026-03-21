@@ -39,7 +39,7 @@ export function createTranslateHandler(state: AppState) {
 
 		// ── Phase 1: scan & validate ──────────────────────────────────────────
 		const scanned = [];
-		for (const file of Array.from(state.pendingFiles).filter((f) =>
+		for (const file of state.pendingFiles.filter((f) =>
 			f.name.toLowerCase().endsWith('.xml')
 		)) {
 			const content = await file.text();
@@ -85,7 +85,7 @@ export function createTranslateHandler(state: AppState) {
 					const res = await fetch('/api/translate', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ items: batch, filename: entry.name }),
+						body: JSON.stringify({ items: batch, filename: entry.name, apiKey: state.apiKey }),
 					});
 
 					if (!res.ok) {

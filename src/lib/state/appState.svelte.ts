@@ -27,10 +27,49 @@ export class AppState {
 	/** Final translated XML strings keyed by filename — populated per file. */
 	readonly translatedContents = new SvelteMap<string, string>();
 
+	// ── Settings state ────────────────────────────────────────────────────────
+
+	/** Selected translation provider identifier. */
+	provider = $state('google');
+
+	/** User-supplied API key, loaded from and persisted to localStorage. */
+	apiKey = $state('');
+
+	/** Whether the settings modal is open. */
+	showSettings = $state(false);
+
+	/** True once the user has saved a non-empty API key. */
+	readonly isConfigured = $derived(this.apiKey.trim().length > 0);
+
+	/**
+	 * Reads persisted settings from localStorage and opens the settings modal
+	 * if no API key has been configured yet. Call once on app mount.
+	 */
+	init(): void {
+		if (typeof window === 'undefined') return;
+		this.provider = localStorage.getItem('translationProvider') ?? 'google';
+		this.apiKey = localStorage.getItem('translationApiKey') ?? '';
+		if (!this.apiKey) this.showSettings = true;
+	}
+
+	/**
+	 * Persists the provider and API key to localStorage and closes the modal.
+	 *
+	 * @param provider  Provider identifier (e.g. `'google'`).
+	 * @param apiKey    The user's API key for the chosen provider.
+	 */
+	saveSettings(provider: string, apiKey: string): void {
+		this.provider = provider;
+		this.apiKey = apiKey.trim();
+		localStorage.setItem('translationProvider', provider);
+		localStorage.setItem('translationApiKey', this.apiKey);
+		this.showSettings = false;
+	}
+
 	// ── Confirmation dialog state ─────────────────────────────────────────────
 
-	/** Files from the OS picker, held until the user confirms or cancels. */
-	pendingFiles = $state<FileList | null>(null);
+	/** Files from the OS picker or drag-and-drop, held until the user confirms or cancels. */
+	pendingFiles = $state<File[] | null>(null);
 
 	/** Detected folder name shown inside the confirmation dialog. */
 	pendingFolderName = $state('');

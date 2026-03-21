@@ -16,11 +16,11 @@ export function createFolderHandlers(state: AppState) {
 	 * Stores the raw `FileList` and detected metadata in pending state, then
 	 * surfaces the confirmation dialog so the user can review before translating.
 	 *
-	 * @param files       Raw `FileList` from the `<input>` element.
+	 * @param files       Files from the OS picker or a folder drag-and-drop.
 	 * @param folderName  Detected folder path shown in the confirmation dialog.
 	 * @param xmlCount    Number of `.xml` files found in the selection.
 	 */
-	function handleFolderSelect(files: FileList, folderName: string, xmlCount: number): void {
+	function handleFolderSelect(files: File[], folderName: string, xmlCount: number): void {
 		state.pendingFiles = files;
 		state.pendingFolderName = folderName;
 		state.pendingFileCount = xmlCount;
