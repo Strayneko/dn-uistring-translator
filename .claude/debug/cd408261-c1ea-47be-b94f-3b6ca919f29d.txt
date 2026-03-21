@@ -1,0 +1,26 @@
+2026-03-19T20:00:31.179Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.180Z [DEBUG] MDM settings load completed in 17ms
+2026-03-19T20:00:31.197Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.197Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\WINDOWS\system32\.claude\settings.json
+2026-03-19T20:00:31.197Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.197Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\WINDOWS\system32\.claude\settings.local.json
+2026-03-19T20:00:31.197Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.197Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\ProgramData\ClaudeCode\managed-settings.json
+2026-03-19T20:00:31.198Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.198Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\ProgramData\ClaudeCode\managed-settings.json
+2026-03-19T20:00:31.199Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-19T20:00:31.199Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-19T20:00:31.199Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-19T20:00:31.199Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-19T20:00:31.227Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-03-19T20:00:31.230Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.230Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\ProgramData\ClaudeCode\managed-settings.json
+2026-03-19T20:00:31.231Z [DEBUG] detectFileEncoding failed for expected reason: ENOENT
+2026-03-19T20:00:31.231Z [DEBUG] Broken symlink or missing file encountered for settings.json at path: C:\ProgramData\ClaudeCode\managed-settings.json
+2026-03-19T20:00:31.231Z [DEBUG] Git remote URL: null
+2026-03-19T20:00:31.231Z [DEBUG] No git remote URL found
+2026-03-19T20:00:32.532Z [DEBUG] SSH config check: code=255 configured=false
+2026-03-19T20:00:32.532Z [INFO] SSH not configured for GitHub, using HTTPS for anthropics/claude-plugins-official
+2026-03-19T20:00:32.551Z [DEBUG] git pull: cwd=C:\Users\bayur\.claude\plugins\marketplaces\anthropics-claude-plugins-official ref=default
+2026-03-19T20:00:32.581Z [WARN] git pull failed, will re-clone:
+2026-03-19T20:00:32.582Z [DEBUG] git clone: url=https://github.com/anthropics/claude-plugins-official.git ref=default timeout=120000ms

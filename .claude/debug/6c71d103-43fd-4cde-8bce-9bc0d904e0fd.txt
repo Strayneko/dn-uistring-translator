@@ -1,0 +1,64 @@
+2026-03-02T01:41:29.182Z [DEBUG] MDM settings load completed in 14ms
+2026-03-02T01:41:29.187Z [DEBUG] [init] configureGlobalMTLS starting
+2026-03-02T01:41:29.187Z [DEBUG] [init] configureGlobalMTLS complete
+2026-03-02T01:41:29.187Z [DEBUG] [init] configureGlobalAgents starting
+2026-03-02T01:41:29.187Z [DEBUG] [init] configureGlobalAgents complete
+2026-03-02T01:41:29.213Z [DEBUG] Using bash path: "C:\Program Files\Git\bin\bash.exe"
+2026-03-02T01:41:29.219Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-03-02T01:41:29.220Z [DEBUG] [ToolSearch:optimistic] mode=standard, ENABLE_TOOL_SEARCH=false, result=false
+2026-03-02T01:41:29.220Z [DEBUG] [STARTUP] Running setup()...
+2026-03-02T01:41:29.223Z [DEBUG] Loading skills from: managed=C:\ProgramData\ClaudeCode\.claude\skills, user=C:\Users\bayur\.claude\skills, project=[]
+2026-03-02T01:41:29.224Z [ERROR] Error: Error: ENOENT: no such file or directory, open 'C:\ProgramData\ClaudeCode\managed-settings.json'
+    at openSync (unknown)
+    at readSync (B:/~BUN/root/claude.exe:12:1441)
+    at OF (B:/~BUN/root/claude.exe:6426:113)
+    at fB (B:/~BUN/root/claude.exe:6428:226)
+    at DxE (B:/~BUN/root/claude.exe:6412:5335)
+    at RLI (B:/~BUN/root/claude.exe:6412:5108)
+    at <anonymous> (B:/~BUN/root/claude.exe:6412:3801)
+    at async bLI (B:/~BUN/root/claude.exe:6412:4183)
+    at async <anonymous> (B:/~BUN/root/claude.exe:11979:400)
+    at processTicksAndRejections (native:7:39)
+2026-03-02T01:41:29.224Z [DEBUG] Error log sink initialized
+2026-03-02T01:41:29.226Z [DEBUG] [STARTUP] setup() completed in 6ms
+2026-03-02T01:41:29.226Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-03-02T01:41:29.226Z [DEBUG] Git remote URL: null
+2026-03-02T01:41:29.226Z [DEBUG] No git remote URL found
+2026-03-02T01:41:29.230Z [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-03-02T01:41:29.230Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-03-02T01:41:29.233Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-03-02T01:41:29.233Z [DEBUG] Total plugin skills loaded: 0
+2026-03-02T01:41:29.233Z [DEBUG] Total plugin commands loaded: 0
+2026-03-02T01:41:29.233Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-03-02T01:41:29.233Z [DEBUG] Total plugin agents loaded: 0
+2026-03-02T01:41:29.238Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-03-02T01:41:29.238Z [DEBUG] [STARTUP] Commands and agents loaded in 12ms
+2026-03-02T01:41:29.238Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-03-02T01:41:29.238Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-03-02T01:41:29.238Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-03-02T01:41:29.239Z [DEBUG] Total LSP servers loaded: 0
+2026-03-02T01:41:29.239Z [DEBUG] [STARTUP] MCP configs loaded in 20ms
+2026-03-02T01:41:29.241Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-03-02T01:41:29.241Z [DEBUG] LSP manager initialized with 0 servers
+2026-03-02T01:41:29.241Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-03-02T01:41:29.241Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-03-02T01:41:29.241Z [DEBUG] LSP server manager initialized successfully
+2026-03-02T01:41:29.241Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-03-02T01:41:29.242Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-02T01:41:29.257Z [DEBUG] Watching for changes in setting files C:\Users\bayur\.claude\settings.json...
+2026-03-02T01:41:29.274Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-03-02T01:41:29.274Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-03-02T01:41:29.277Z [DEBUG] Plugin autoupdate: skipped (auto-updater disabled)
+2026-03-02T01:41:29.287Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-03-02T01:41:29.287Z [DEBUG] Found 0 hook matchers in settings
+2026-03-02T01:41:29.288Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-03-02T01:41:29.288Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-03-02T01:41:29.288Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-03-02T01:41:29.289Z [DEBUG] [FileIndex] not a git repo, returning null
+2026-03-02T01:41:29.289Z [DEBUG] [FileIndex] git ls-files returned null, falling back to ripgrep
+2026-03-02T01:41:29.298Z [DEBUG] installPluginsForHeadless: starting
+2026-03-02T01:41:29.298Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-03-02T01:41:29.298Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-03-02T01:41:29.300Z [DEBUG] Total plugin output styles loaded: 0
+2026-03-02T01:41:29.301Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-03-02T01:41:29.309Z [DEBUG] Security messages are fresh (<1h old), skipping fetch

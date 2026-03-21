@@ -1,0 +1,27 @@
+{
+  "cachedGrowthBookFeatures": {
+    "tengu_mcp_tool_search": false,
+    "tengu_event_sampling_config": {},
+    "tengu_log_segment_events": false,
+    "tengu_log_datadog_events": true,
+    "tengu_marble_anvil": true,
+    "tengu_tool_pear": false,
+    "tengu_scarf_coffee": false,
+    "tengu_claudeai_mcp_connectors": true,
+    "tengu_keybinding_customization_release": true
+  },
+  "firstStartTime": "2026-03-01T06:18:47.238Z",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "userID": "a8004e699dd125c485a4c7849abc52cde1a07e096ded9c2a3168f9a738c0d944",
+  "oauthAccount": {
+    "accountUuid": "284ec64d-a36d-49fc-b4ff-77e0ad13ade1",
+    "emailAddress": "bayurendi10@gmail.com",
+    "organizationUuid": "f7b1a9ca-4f8f-4893-b09e-4b006d15fd3a",
+    "hasExtraUsageEnabled": false,
+    "billingType": "stripe_subscription",
+    "accountCreatedAt": "2024-07-05T08:31:30.952818Z",
+    "subscriptionCreatedAt": "2026-02-26T02:02:23.266750Z",
+    "displayName": "Ren"
+  }
+}

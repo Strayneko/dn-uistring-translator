@@ -1,0 +1,73 @@
+{
+  "cachedGrowthBookFeatures": {
+    "tengu_mcp_tool_search": true,
+    "tengu_event_sampling_config": {},
+    "tengu_log_segment_events": false,
+    "tengu_log_datadog_events": true,
+    "tengu_marble_anvil": true,
+    "tengu_tool_pear": false,
+    "tengu_scarf_coffee": false,
+    "tengu_claudeai_mcp_connectors": true,
+    "tengu_keybinding_customization_release": true,
+    "tengu_slate_nexus": true,
+    "tengu_amber_quartz": false,
+    "tengu_thinkback": false,
+    "tengu_chomp_inflection": true,
+    "tengu_marble_sandcastle": true,
+    "tengu_penguins_off": null,
+    "tengu_marble_lantern_disabled": false,
+    "tengu_vscode_review_upsell": false,
+    "tengu_vscode_onboarding": false,
+    "tengu_quiet_fern": true,
+    "tengu_slate_ridge": false,
+    "tengu_pebble_leaf_prune": false,
+    "tengu_mcp_elicitation": false,
+    "tengu_mulberry_fog": false,
+    "tengu_coral_fern": false,
+    "tengu_summarize_tool_results": false,
+    "tengu_bergotte_lantern": false,
+    "tengu_swann_brevity": "control",
+    "tengu_system_prompt_global_cache": false,
+    "enhanced_telemetry_beta": false,
+    "tengu_streaming_tool_execution2": true,
+    "tengu_moth_copse": false,
+    "tengu_cache_plum_violet": false,
+    "tengu_tool_search_unsupported_models": [
+      "haiku"
+    ],
+    "tengu_fgts": false,
+    "tengu_plan_mode_interview_phase": false,
+    "tengu_attribution_header": false,
+    "tengu_prompt_cache_1h_config": {
+      "allowlist": [
+        "repl_main_thread*",
+        "sdk"
+      ]
+    },
+    "tengu_tool_input_aliasing": false,
+    "tengu_coral_whistle": false,
+    "tengu_pid_based_version_locking": true
+  },
+  "firstStartTime": "2026-03-01T06:18:47.238Z",
+  "opusProMigrationComplete": true,
+  "sonnet1m45MigrationComplete": true,
+  "userID": "a8004e699dd125c485a4c7849abc52cde1a07e096ded9c2a3168f9a738c0d944",
+  "oauthAccount": {
+    "accountUuid": "284ec64d-a36d-49fc-b4ff-77e0ad13ade1",
+    "emailAddress": "bayurendi10@gmail.com",
+    "organizationUuid": "f7b1a9ca-4f8f-4893-b09e-4b006d15fd3a",
+    "hasExtraUsageEnabled": false,
+    "billingType": "stripe_subscription",
+    "accountCreatedAt": "2024-07-05T08:31:30.952818Z",
+    "subscriptionCreatedAt": "2026-02-26T02:02:23.266750Z",
+    "displayName": "Ren"
+  },
+  "penguinModeOrgEnabled": false,
+  "cachedExtraUsageDisabledReason": "org_level_disabled",
+  "toolUsage": {
+    "Bash": {
+      "usageCount": 1,
+      "lastUsedAt": 1772346252265
+    }
+  }
+}
