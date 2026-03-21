@@ -61,6 +61,7 @@
 			files={state.xmlFiles}
 			folderPath={state.folderPath}
 			doneCount={state.doneCount}
+			errorCount={state.errorCount}
 			totalCount={state.totalCount}
 			overallProgress={state.overallProgress}
 			allDone={state.allDone}
