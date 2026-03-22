@@ -59,7 +59,7 @@
 				</div>
 				<div>
 					<h1 class="text-lg font-semibold text-white">Uistring Translator</h1>
-					<p class="text-xs text-foreground-muted">Created by Strayneko</p>
+					<p class="text-xs text-foreground-muted">Created by <a href="https://github.com/strayneko" target="_blank" rel="noopener noreferrer" class="text-primary-accent underline underline-offset-2 hover:text-primary-subtle transition-colors">Strayneko</a></p>
 				</div>
 			</div>
 
