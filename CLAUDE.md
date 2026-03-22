@@ -24,6 +24,9 @@ A SvelteKit web app that translates Chinese CDATA strings inside XML files to En
 ```
 src/
 ├── lib/
+│   ├── assets/
+│   │   ├── favicon.svg
+│   │   └── app.css                       — Tailwind entry + all @theme color tokens (single source of truth)
 │   ├── types.ts                          — XmlFile, TranslationItem, FileStatus (client)
 │   ├── utils/
 │   │   └── xml.ts                        — isValidXml, extractCdata, substituteCdata
@@ -48,6 +51,7 @@ src/
 │           └── deepl.ts                  — DeepL v2 REST, batched at 50; auto-detects free/paid endpoint
 └── (no database or server env vars — fully client-driven)
 └── routes/
+    ├── +layout.svelte                    — imports app.css, sets <title>UI String Translator</title>
     ├── +page.svelte                      — state wiring only (new AppState + 4 handler factories)
     └── api/translate/
         └── +server.ts                    — POST endpoint; reads apiKey from request body, calls getProvider
@@ -109,6 +113,8 @@ None required. `.env` and `.env.example` are intentionally empty — all API key
 - Settings modal: unclosable on first run, reopenable via header button; privacy note always visible below key field
 - Folder selector supports click-to-browse and drag-and-drop
 - No database, no server env vars — fully client-driven
+- All theme colors centralized in `src/lib/assets/app.css` as Tailwind v4 `@theme` tokens; no hardcoded colors in components
+- Page title set to "UI String Translator"
 - Codebase fully refactored: SOLID components, typed handlers, reactive state class, pure XML utilities
 - No pending tasks
 
