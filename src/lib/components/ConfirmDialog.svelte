@@ -18,15 +18,15 @@
 		aria-labelledby="confirm-title"
 	>
 		<div
-			class="w-full max-w-md mx-4 bg-[#0d2137] border border-blue-800/60 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
+			class="w-full max-w-md mx-4 bg-surface border border-border/60 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
 		>
-			<div class="px-6 pt-6 pb-4 border-b border-blue-900/40">
+			<div class="px-6 pt-6 pb-4 border-b border-border/40">
 				<div class="flex items-start gap-4">
 					<div
-						class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0 mt-0.5"
+						class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 mt-0.5"
 					>
 						<svg
-							class="w-5 h-5 text-blue-400"
+							class="w-5 h-5 text-primary-accent"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -43,7 +43,7 @@
 						<h2 id="confirm-title" class="text-base font-semibold text-white">
 							Translate XML files?
 						</h2>
-						<p class="text-sm text-slate-400 mt-0.5">
+						<p class="text-sm text-foreground-muted mt-0.5">
 							The following folder will be scanned and all valid XML files will be translated.
 						</p>
 					</div>
@@ -51,13 +51,13 @@
 			</div>
 
 			<div class="px-6 py-4 space-y-3">
-				<div class="bg-[#07111f] border border-blue-900/50 rounded-lg px-4 py-3">
-					<p class="text-xs text-slate-500 mb-1">Folder path</p>
-					<p class="text-sm text-slate-200 font-mono break-all">{folderName}</p>
+				<div class="bg-background border border-border/50 rounded-lg px-4 py-3">
+					<p class="text-xs text-foreground-subtle mb-1">Folder path</p>
+					<p class="text-sm text-foreground-bright font-mono break-all">{folderName}</p>
 				</div>
-				<div class="flex items-center gap-2 text-sm text-slate-400">
+				<div class="flex items-center gap-2 text-sm text-foreground-muted">
 					<svg
-						class="w-4 h-4 text-blue-500 shrink-0"
+						class="w-4 h-4 text-primary shrink-0"
 						fill="none"
 						viewBox="0 0 24 24"
 						stroke="currentColor"
@@ -73,7 +73,7 @@
 						No XML files detected
 					{:else}
 						<span
-							><span class="text-blue-300 font-medium">{fileCount}</span> XML
+							><span class="text-primary-subtle font-medium">{fileCount}</span> XML
 							{fileCount === 1 ? 'file' : 'files'} detected</span
 						>
 					{/if}
@@ -83,14 +83,14 @@
 			<div class="px-6 pb-6 flex gap-3 justify-end">
 				<button
 					onclick={onCancel}
-					class="px-4 py-2 text-sm font-medium text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-lg transition-colors"
+					class="px-4 py-2 text-sm font-medium text-foreground-dim bg-neutral hover:bg-neutral-hover border border-neutral-hover rounded-lg transition-colors"
 				>
 					Cancel
 				</button>
 				<button
 					onclick={onConfirm}
 					disabled={fileCount === 0}
-					class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
+					class="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
 				>
 					<svg
 						class="w-4 h-4"

@@ -2,10 +2,10 @@
 	import type { XmlFile } from '$lib/types';
 
 	const STATUS_CONFIG = {
-		pending: { label: 'Pending', class: 'bg-slate-700 text-slate-300' },
-		'in-progress': { label: 'In Progress', class: 'bg-blue-700 text-blue-200' },
-		done: { label: 'Done', class: 'bg-emerald-800 text-emerald-300' },
-		error: { label: 'Error', class: 'bg-red-900 text-red-300' },
+		pending:     { label: 'Pending',     class: 'bg-neutral text-foreground-dim' },
+		'in-progress': { label: 'In Progress', class: 'bg-primary-strong text-primary-fg' },
+		done:        { label: 'Done',        class: 'bg-success-muted text-success-subtle' },
+		error:       { label: 'Error',       class: 'bg-destructive text-destructive-subtle' },
 	} as const;
 
 	interface Props {
@@ -20,12 +20,12 @@
 	);
 </script>
 
-<li class="flex items-center gap-4 px-6 py-4 hover:bg-blue-900/10 transition-colors">
+<li class="flex items-center gap-4 px-6 py-4 hover:bg-primary-muted/10 transition-colors">
 	<div
-		class="w-8 h-8 rounded-md bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0"
+		class="w-8 h-8 rounded-md bg-neutral border border-neutral-hover flex items-center justify-center shrink-0"
 	>
 		<svg
-			class="w-4 h-4 text-blue-400"
+			class="w-4 h-4 text-primary-accent"
 			fill="none"
 			viewBox="0 0 24 24"
 			stroke="currentColor"
@@ -40,24 +40,24 @@
 	</div>
 
 	<div class="flex-1 min-w-0">
-		<p class="text-sm font-medium text-slate-100 truncate">{file.name}</p>
+		<p class="text-sm font-medium text-foreground truncate">{file.name}</p>
 
 		{#if file.status === 'error' && file.errorMsg}
-			<p class="text-xs text-red-400 mt-0.5 truncate" title={file.errorMsg}>{file.errorMsg}</p>
+			<p class="text-xs text-destructive-accent mt-0.5 truncate" title={file.errorMsg}>{file.errorMsg}</p>
 		{:else if file.status === 'in-progress' && file.totalStrings > 0}
 			<div class="flex items-center gap-2 mt-1.5">
-				<div class="flex-1 h-1 bg-slate-800 rounded-full overflow-hidden">
+				<div class="flex-1 h-1 bg-neutral rounded-full overflow-hidden">
 					<div
-						class="h-full bg-blue-500 rounded-full transition-all duration-300"
+						class="h-full bg-primary-hover rounded-full transition-all duration-300"
 						style="width: {fileProgress}%"
 					></div>
 				</div>
-				<span class="text-xs text-slate-400 shrink-0">
+				<span class="text-xs text-foreground-muted shrink-0">
 					{file.translatedStrings} / {file.totalStrings} strings
 				</span>
 			</div>
 		{:else}
-			<p class="text-xs text-slate-500 mt-0.5">{file.lines.toLocaleString()} lines</p>
+			<p class="text-xs text-foreground-subtle mt-0.5">{file.lines.toLocaleString()} lines</p>
 		{/if}
 	</div>
 

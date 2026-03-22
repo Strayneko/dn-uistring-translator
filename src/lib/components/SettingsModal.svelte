@@ -85,17 +85,17 @@
 			aria-modal="true"
 			aria-labelledby="settings-title"
 			tabindex="-1"
-			class="w-full max-w-md mx-4 bg-[#0d2137] border border-blue-800/60 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
+			class="w-full max-w-md mx-4 bg-surface border border-border/60 rounded-2xl shadow-2xl shadow-black/50 overflow-hidden"
 			onclick={(e) => e.stopPropagation()}
 		>
 			<!-- Header -->
-			<div class="px-6 pt-6 pb-4 border-b border-blue-900/40 flex items-start justify-between">
+			<div class="px-6 pt-6 pb-4 border-b border-border/40 flex items-start justify-between">
 				<div class="flex items-start gap-4">
 					<div
-						class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-600/30 flex items-center justify-center shrink-0 mt-0.5"
+						class="w-10 h-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center shrink-0 mt-0.5"
 					>
 						<svg
-							class="w-5 h-5 text-blue-400"
+							class="w-5 h-5 text-primary-accent"
 							fill="none"
 							viewBox="0 0 24 24"
 							stroke="currentColor"
@@ -114,8 +114,8 @@
 						</svg>
 					</div>
 					<div>
-						<h2 class="text-base font-semibold text-white">Translation Settings</h2>
-						<p class="text-sm text-slate-400 mt-0.5">
+						<h2 id="settings-title" class="text-base font-semibold text-white">Translation Settings</h2>
+						<p class="text-sm text-foreground-muted mt-0.5">
 							{canClose ? 'Update your provider and API key.' : 'Set up your provider and API key to get started.'}
 						</p>
 					</div>
@@ -124,7 +124,7 @@
 				{#if canClose}
 					<button
 						onclick={onClose}
-						class="text-slate-500 hover:text-slate-300 transition-colors mt-0.5"
+						class="text-foreground-subtle hover:text-foreground-dim transition-colors mt-0.5"
 						aria-label="Close settings"
 					>
 						<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -138,12 +138,12 @@
 			<div class="px-6 py-5 space-y-4">
 				<!-- Provider selector -->
 				<div class="space-y-1.5">
-					<label for="provider-select" class="block text-sm text-slate-300">Provider</label>
+					<label for="provider-select" class="block text-sm text-foreground-dim">Provider</label>
 					<select
 						id="provider-select"
 						value={provider}
 						onchange={handleProviderChange}
-						class="w-full bg-[#07111f] border border-blue-900/60 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-blue-500 transition-colors"
+						class="w-full bg-background border border-border/60 text-foreground-bright text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-primary-hover transition-colors"
 					>
 						{#each PROVIDERS as p (p.value)}
 							<option value={p.value}>{p.label}</option>
@@ -153,7 +153,7 @@
 
 				<!-- API key input -->
 				<div class="space-y-1.5">
-					<label for="api-key-input" class="block text-sm text-slate-300">
+					<label for="api-key-input" class="block text-sm text-foreground-dim">
 						{activeProvider.keyLabel}
 					</label>
 					<div class="relative">
@@ -162,12 +162,12 @@
 							type={showKey ? 'text' : 'password'}
 							bind:value={apiKey}
 							placeholder={activeProvider.keyPlaceholder}
-							class="w-full bg-[#07111f] border border-blue-900/60 text-slate-200 text-sm rounded-lg px-3 py-2.5 pr-10 focus:outline-none focus:border-blue-500 transition-colors placeholder:text-slate-600"
+							class="w-full bg-background border border-border/60 text-foreground-bright text-sm rounded-lg px-3 py-2.5 pr-10 focus:outline-none focus:border-primary-hover transition-colors placeholder:text-foreground-ghost"
 						/>
 						<button
 							type="button"
 							onclick={() => (showKey = !showKey)}
-							class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+							class="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-foreground-dim transition-colors"
 							aria-label={showKey ? 'Hide API key' : 'Show API key'}
 						>
 							{#if showKey}
@@ -182,7 +182,7 @@
 							{/if}
 						</button>
 					</div>
-					<p class="text-xs text-slate-500">
+					<p class="text-xs text-foreground-subtle">
 						Your key is saved only in your browser's local storage — it is never sent to or stored on our servers.
 					</p>
 				</div>
@@ -191,13 +191,13 @@
 			<!-- Footer -->
 			<div class="px-6 pb-6 space-y-3">
 				{#if errorMsg}
-					<p class="text-sm text-red-400 bg-red-900/20 border border-red-800/40 rounded-lg px-3 py-2">{errorMsg}</p>
+					<p class="text-sm text-destructive-accent bg-destructive/20 border border-destructive/40 rounded-lg px-3 py-2">{errorMsg}</p>
 				{/if}
 				<div class="flex justify-end">
 					<button
 						onclick={handleSave}
 						disabled={!canSave || saving}
-						class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
+						class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-white bg-primary hover:bg-primary-hover disabled:opacity-40 disabled:cursor-not-allowed rounded-lg transition-colors"
 					>
 						{#if saving}
 							<svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">

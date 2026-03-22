@@ -84,7 +84,7 @@
 </script>
 
 <div class="space-y-2">
-	<label for="folder-input" class="block text-sm text-slate-300">Source Folder</label>
+	<label for="folder-input" class="block text-sm text-foreground-dim">Source Folder</label>
 	<div class="flex gap-3">
 		<!-- Drop zone + path display -->
 		<div
@@ -94,11 +94,11 @@
 			ondragleave={handleDragLeave}
 			ondrop={handleDrop}
 			class="flex-1 flex items-center gap-3 rounded-lg px-4 py-2.5 min-w-0 border transition-colors {isDragging
-				? 'bg-blue-900/20 border-blue-500 border-dashed'
-				: 'bg-[#07111f] border-blue-900/60'}"
+				? 'bg-primary-muted/20 border-primary-hover border-dashed'
+				: 'bg-background border-border/60'}"
 		>
 			<svg
-				class="w-4 h-4 shrink-0 transition-colors {isDragging ? 'text-blue-300' : 'text-blue-400'}"
+				class="w-4 h-4 shrink-0 transition-colors {isDragging ? 'text-primary-subtle' : 'text-primary-accent'}"
 				fill="none"
 				viewBox="0 0 24 24"
 				stroke="currentColor"
@@ -118,7 +118,7 @@
 					/>
 				{/if}
 			</svg>
-			<span class="text-sm truncate {folderPath ? 'text-slate-200' : isDragging ? 'text-blue-300' : 'text-slate-500'}">
+			<span class="text-sm truncate {folderPath ? 'text-foreground-bright' : isDragging ? 'text-primary-subtle' : 'text-foreground-subtle'}">
 				{isDragging ? 'Drop folder here' : folderPath || 'No folder selected — or drag and drop'}
 			</span>
 		</div>
@@ -134,7 +134,7 @@
 				multiple
 			/>
 			<span
-				class="inline-flex items-center gap-2 bg-blue-800 hover:bg-blue-700 border border-blue-600 text-blue-100 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
+				class="inline-flex items-center gap-2 bg-primary-dim hover:bg-primary-strong border border-primary text-primary-fg text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
 			>
 				<svg
 					class="w-4 h-4"

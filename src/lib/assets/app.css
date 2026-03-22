@@ -1,0 +1,62 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/**
+ * ─── Theme Tokens ────────────────────────────────────────────────────────────
+ *
+ * All colors live here. To change the theme, edit the values below.
+ * Each token becomes a Tailwind utility: bg-*, text-*, border-*, etc.
+ *
+ * Page layers     → background, surface, header, inset
+ * Border          → border
+ * Primary (blue)  → primary-*
+ * Success         → success-*
+ * Destructive     → destructive-*
+ * Text            → foreground-*
+ * Neutral         → neutral, neutral-hover
+ */
+@theme {
+  /* ─── Page layers ──────────────────────────────────────────────────────── */
+  --color-background: #07111f; /* page background + input fields          */
+  --color-surface:    #0d2137; /* cards, modals                            */
+  --color-header:     #0a1929; /* top header bar                           */
+  --color-inset:      #091a2e; /* inset panels (e.g. progress strip)       */
+
+  /* ─── Border ───────────────────────────────────────────────────────────── */
+  --color-border: #1e3a5f; /* ≈ blue-900 */
+
+  /* ─── Primary (blue) ───────────────────────────────────────────────────── */
+  --color-primary:        #2563eb; /* blue-600 — buttons, active state        */
+  --color-primary-hover:  #3b82f6; /* blue-500 — hover, progress bars         */
+  --color-primary-strong: #1d4ed8; /* blue-700 — in-progress status badge     */
+  --color-primary-dim:    #1e40af; /* blue-800 — browse button, scrollbar     */
+  --color-primary-muted:  #1e3a5f; /* blue-900 — badge backgrounds            */
+  --color-primary-accent: #60a5fa; /* blue-400 — icons                        */
+  --color-primary-subtle: #93c5fd; /* blue-300 — section headings, labels     */
+  --color-primary-fg:     #dbeafe; /* blue-100 — text on primary-dim buttons  */
+
+  /* ─── Success (emerald) ────────────────────────────────────────────────── */
+  --color-success:        #047857; /* emerald-700 — download button           */
+  --color-success-hover:  #059669; /* emerald-600 — download button hover     */
+  --color-success-muted:  #064e3b; /* emerald-900 — "done" badge bg           */
+  --color-success-accent: #34d399; /* emerald-400 — "done" badge text         */
+  --color-success-subtle: #6ee7b7; /* emerald-300 — file-row done label text  */
+
+  /* ─── Destructive (red) ────────────────────────────────────────────────── */
+  --color-destructive:        #7f1d1d; /* red-900 — error badge bg + borders  */
+  --color-destructive-accent: #f87171; /* red-400 — error badge text          */
+  --color-destructive-subtle: #fca5a5; /* red-300 — file-row error label text */
+
+  /* ─── Text ─────────────────────────────────────────────────────────────── */
+  --color-foreground:        #f1f5f9; /* slate-100 — primary text             */
+  --color-foreground-bright: #e2e8f0; /* slate-200 — bright secondary text    */
+  --color-foreground-dim:    #cbd5e1; /* slate-300 — labels, light secondary  */
+  --color-foreground-muted:  #94a3b8; /* slate-400 — secondary / captions     */
+  --color-foreground-subtle: #64748b; /* slate-500 — tertiary / hints         */
+  --color-foreground-ghost:  #475569; /* slate-600 — placeholders             */
+
+  /* ─── Neutral surfaces ─────────────────────────────────────────────────── */
+  --color-neutral:       #1e293b; /* slate-800 — muted backgrounds           */
+  --color-neutral-hover: #334155; /* slate-700 — hover / border on neutral   */
+}

@@ -37,12 +37,12 @@
 	onCancel={handleCancel}
 />
 
-<div class="min-h-screen bg-[#07111f] text-slate-100 font-sans">
+<div class="min-h-screen bg-background text-foreground font-sans">
 	<!-- Header -->
-	<header class="border-b border-blue-900/50 bg-[#0a1929] px-8 py-5">
+	<header class="border-b border-border/50 bg-header px-8 py-5">
 		<div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
 			<div class="flex items-center gap-3">
-				<div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+				<div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
 					<svg
 						class="w-5 h-5 text-white"
 						fill="none"
@@ -55,18 +55,18 @@
 							stroke-linejoin="round"
 							d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"
 						/>
-					</svg>
+					</svg> 
 				</div>
 				<div>
-					<h1 class="text-lg font-semibold text-white">XML String Translator</h1>
-					<p class="text-xs text-slate-400">Powered by Google Translate</p>
+					<h1 class="text-lg font-semibold text-white">  c String Translator</h1>
+					<p class="text-xs text-foreground-muted">Created by Strayneko</p>
 				</div>
 			</div>
 
 			<!-- Settings button -->
 			<button
 				onclick={handleOpenSettings}
-				class="flex items-center gap-2 text-sm text-slate-400 hover:text-slate-200 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/60 px-3 py-1.5 rounded-lg transition-colors"
+				class="flex items-center gap-2 text-sm text-foreground-muted hover:text-foreground-dim bg-neutral/60 hover:bg-neutral-hover/60 border border-neutral-hover/60 px-3 py-1.5 rounded-lg transition-colors"
 				aria-label="Open settings"
 			>
 				<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -84,8 +84,8 @@
 
 	<main class="max-w-4xl mx-auto px-8 py-8 space-y-6">
 		<!-- Configuration -->
-		<div class="bg-[#0d2137] border border-blue-900/50 rounded-xl p-6 space-y-5">
-			<h2 class="text-sm font-semibold text-blue-300 uppercase tracking-wider">Configuration</h2>
+		<div class="bg-surface border border-border/50 rounded-xl p-6 space-y-5">
+			<h2 class="text-sm font-semibold text-primary-subtle uppercase tracking-wider">Configuration</h2>
 			<FolderSelector folderPath={state.folderPath} onSelect={handleFolderSelect} />
 		</div>
 
