@@ -58,7 +58,7 @@
 					</svg> 
 				</div>
 				<div>
-					<h1 class="text-lg font-semibold text-white">  c String Translator</h1>
+					<h1 class="text-lg font-semibold text-white">Uistring Translator</h1>
 					<p class="text-xs text-foreground-muted">Created by Strayneko</p>
 				</div>
 			</div>
