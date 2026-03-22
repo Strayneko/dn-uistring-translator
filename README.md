@@ -83,12 +83,6 @@ Once all files are processed a **Download ZIP** button appears. Click it to down
 
 ---
 
-## No environment variables required
-
-There are no `.env` values needed to run this app. All API keys are managed per-user through the Settings modal and stored in the browser.
-
----
-
 ## Tech stack
 
 - [SvelteKit 2](https://kit.svelte.dev/) + [Svelte 5](https://svelte.dev/)
