@@ -46,6 +46,7 @@
 		"vitest-browser-svelte": "^2.0.2"
 	},
 	"dependencies": {
+		"@vitalets/google-translate-api": "^9.2.1",
 		"jszip": "^3.10.1"
 	}
 }

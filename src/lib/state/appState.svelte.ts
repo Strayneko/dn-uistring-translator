@@ -35,11 +35,24 @@ export class AppState {
 	/** User-supplied API key, loaded from and persisted to localStorage. */
 	apiKey = $state('');
 
+	/** LibreTranslate endpoint URL, persisted to localStorage. */
+	libretranslateUrl = $state('https://libretranslate.com/translate');
+
 	/** Whether the settings modal is open. */
 	showSettings = $state(false);
 
-	/** True once the user has saved a non-empty API key. */
-	readonly isConfigured = $derived(this.apiKey.trim().length > 0);
+	/** Whether translation is currently paused by the user. */
+	paused = $state(false);
+
+	/** Whether the user has requested an early stop. */
+	stopped = $state(false);
+
+	/** True once the user has saved a non-empty API key, or is using a keyless provider. */
+	readonly isConfigured = $derived(
+		this.provider === 'google-free' ||
+		this.provider === 'libretranslate' ||
+		this.apiKey.trim().length > 0
+	);
 
 	/**
 	 * Reads persisted settings from localStorage and opens the settings modal
@@ -49,7 +62,9 @@ export class AppState {
 		if (typeof window === 'undefined') return;
 		this.provider = localStorage.getItem('translationProvider') ?? 'google';
 		this.apiKey = localStorage.getItem('translationApiKey') ?? '';
-		if (!this.apiKey) this.showSettings = true;
+		this.libretranslateUrl = localStorage.getItem('libretranslateUrl') ?? 'https://libretranslate.com/translate';
+		const keylessProvider = this.provider === 'google-free' || this.provider === 'libretranslate';
+		if (!this.apiKey && !keylessProvider) this.showSettings = true;
 	}
 
 	/**
@@ -58,9 +73,13 @@ export class AppState {
 	 * @param provider  Provider identifier (e.g. `'google'`).
 	 * @param apiKey    The user's API key for the chosen provider.
 	 */
-	saveSettings(provider: string, apiKey: string): void {
+	saveSettings(provider: string, apiKey: string, libretranslateUrl?: string): void {
 		this.provider = provider;
 		this.apiKey = apiKey.trim();
+		if (libretranslateUrl !== undefined) {
+			this.libretranslateUrl = libretranslateUrl.trim() || 'https://libretranslate.com/translate';
+			localStorage.setItem('libretranslateUrl', this.libretranslateUrl);
+		}
 		localStorage.setItem('translationProvider', provider);
 		localStorage.setItem('translationApiKey', this.apiKey);
 		this.showSettings = false;
@@ -105,6 +124,9 @@ export class AppState {
 
 	/** True if at least one file translated successfully (enables ZIP download). */
 	readonly hasSuccessful = $derived(this.xmlFiles.some((f) => f.status === 'done'));
+
+	/** True when a ZIP download can be offered — either all done or user stopped early. */
+	readonly canDownload = $derived((this.allDone || this.stopped) && this.hasSuccessful);
 
 	/** Last path segment of `folderPath`, used as the ZIP archive name. */
 	readonly zipFolderName = $derived(

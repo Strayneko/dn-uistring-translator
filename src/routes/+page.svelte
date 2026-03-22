@@ -25,6 +25,7 @@
 	canClose={state.isConfigured}
 	currentProvider={state.provider}
 	currentApiKey={state.apiKey}
+	currentLibretranslateUrl={state.libretranslateUrl}
 	onSave={handleSaveSettings}
 	onClose={() => (state.showSettings = false)}
 />
@@ -97,10 +98,14 @@
 			errorCount={state.errorCount}
 			totalCount={state.totalCount}
 			overallProgress={state.overallProgress}
-			allDone={state.allDone}
-			hasSuccessful={state.hasSuccessful}
+			translating={state.translating}
+			paused={state.paused}
+			canDownload={state.canDownload}
 			zipFolderName={state.zipFolderName}
 			onDownload={handleDownload}
+			onPause={() => (state.paused = true)}
+			onResume={() => (state.paused = false)}
+			onStop={() => { state.stopped = true; state.paused = false; }}
 		/>
 	</main>
 </div>

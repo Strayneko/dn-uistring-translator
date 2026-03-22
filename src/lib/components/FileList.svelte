@@ -9,10 +9,14 @@
 		errorCount: number;
 		totalCount: number;
 		overallProgress: number;
-		allDone: boolean;
-		hasSuccessful: boolean;
+		translating: boolean;
+		paused: boolean;
+		canDownload: boolean;
 		zipFolderName: string;
 		onDownload: () => void;
+		onPause: () => void;
+		onResume: () => void;
+		onStop: () => void;
 	}
 
 	const {
@@ -22,10 +26,14 @@
 		errorCount,
 		totalCount,
 		overallProgress,
-		allDone,
-		hasSuccessful,
+		translating,
+		paused,
+		canDownload,
 		zipFolderName,
 		onDownload,
+		onPause,
+		onResume,
+		onStop,
 	}: Props = $props();
 </script>
 
@@ -64,7 +72,47 @@
 					></div>
 				</div>
 				<span class="text-xs text-foreground-muted w-10 text-right">{overallProgress}%</span>
+
+				{#if translating}
+					<!-- Pause / Resume -->
+					<button
+						onclick={paused ? onResume : onPause}
+						class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border transition-colors
+							{paused
+								? 'bg-primary/20 border-primary/40 text-primary-accent hover:bg-primary/30'
+								: 'bg-neutral border-border/60 text-foreground-dim hover:bg-neutral-hover'}"
+						aria-label={paused ? 'Resume translation' : 'Pause translation'}
+					>
+						{#if paused}
+							<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M8 5v14l11-7z"/>
+							</svg>
+							Resume
+						{:else}
+							<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+								<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+							</svg>
+							Pause
+						{/if}
+					</button>
+
+					<!-- Stop -->
+					<button
+						onclick={onStop}
+						class="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-lg border bg-destructive/20 border-destructive/40 text-destructive-accent hover:bg-destructive/30 transition-colors"
+						aria-label="Stop translation"
+					>
+						<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+							<path d="M6 6h12v12H6z"/>
+						</svg>
+						Stop
+					</button>
+				{/if}
 			</div>
+
+			{#if paused && translating}
+				<p class="text-xs text-primary-accent mt-2">Paused — will resume after the current request completes.</p>
+			{/if}
 		</div>
 	{/if}
 
@@ -103,7 +151,7 @@
 		</ul>
 
 		<!-- Download ZIP -->
-		{#if allDone && hasSuccessful}
+		{#if canDownload}
 			<div class="px-6 py-4 border-t border-border/40 flex justify-end">
 				<button
 					onclick={onDownload}

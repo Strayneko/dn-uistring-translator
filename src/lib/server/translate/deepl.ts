@@ -1,4 +1,5 @@
 import type { TranslationItem, TranslationProvider } from './types';
+import { withRetry } from './retry';
 
 // DeepL free-tier keys end with ':fx'; paid keys use the standard endpoint.
 const ENDPOINT_FREE = 'https://api-free.deepl.com/v2/translate';
@@ -19,7 +20,7 @@ export class DeepLProvider implements TranslationProvider {
 
 		for (let i = 0; i < items.length; i += BATCH_SIZE) {
 			const batch = items.slice(i, i + BATCH_SIZE);
-			const translated = await this.translateBatch(batch);
+			const translated = await withRetry(() => this.translateBatch(batch));
 			results.push(...translated);
 		}
 
@@ -36,7 +37,8 @@ export class DeepLProvider implements TranslationProvider {
 			body: JSON.stringify({
 				text: items.map((i) => i.text),
 				source_lang: 'ZH',
-				target_lang: 'EN-US'
+				target_lang: 'EN-US',
+				tag_handling: 'html'
 			})
 		});
 

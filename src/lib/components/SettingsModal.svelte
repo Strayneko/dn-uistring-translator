@@ -1,7 +1,9 @@
 <script lang="ts">
 	const PROVIDERS = [
-		{ value: 'google', label: 'Google Translate' },
+		{ value: 'google-free', label: 'Google Translate (Free)' },
+		{ value: 'google', label: 'Google Translate (API Key)' },
 		{ value: 'deepl', label: 'DeepL' },
+		{ value: 'libretranslate', label: 'LibreTranslate' },
 	] as const;
 
 	interface Props {
@@ -10,14 +12,16 @@
 		canClose: boolean;
 		currentProvider: string;
 		currentApiKey: string;
-		onSave: (provider: string, apiKey: string) => Promise<string | null>;
+		currentLibretranslateUrl: string;
+		onSave: (provider: string, apiKey: string, baseUrl?: string) => Promise<string | null>;
 		onClose: () => void;
 	}
 
-	const { show, canClose, currentProvider, currentApiKey, onSave, onClose }: Props = $props();
+	const { show, canClose, currentProvider, currentApiKey, currentLibretranslateUrl, onSave, onClose }: Props = $props();
 
 	let provider = $state('');
 	let apiKey = $state('');
+	let libretranslateUrl = $state('');
 	let showKey = $state(false);
 	let saving = $state(false);
 	let errorMsg = $state('');
@@ -27,6 +31,7 @@
 		if (show) {
 			provider = currentProvider;
 			apiKey = currentApiKey;
+			libretranslateUrl = currentLibretranslateUrl;
 			showKey = false;
 			errorMsg = '';
 		}
@@ -38,21 +43,20 @@
 		errorMsg = '';
 	}
 
-	const canSave = $derived(apiKey.trim().length > 0);
+	const isLibreTranslate = $derived(provider === 'libretranslate');
+	const needsApiKey = $derived(provider !== 'google-free' && !isLibreTranslate);
+	const canSave = $derived(
+		isLibreTranslate
+			? libretranslateUrl.trim().length > 0
+			: !needsApiKey || apiKey.trim().length > 0
+	);
 
-	const providerLabels: Record<string, { name: string; keyLabel: string; keyPlaceholder: string }> =
-		{
-			google: {
-				name: 'Google Translate',
-				keyLabel: 'Google Translate API Key',
-				keyPlaceholder: 'AIza...',
-			},
-			deepl: {
-				name: 'DeepL',
-				keyLabel: 'DeepL API Key',
-				keyPlaceholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx',
-			},
-		};
+	const providerLabels: Record<string, { keyLabel: string; keyPlaceholder: string }> = {
+		'google-free': { keyLabel: '', keyPlaceholder: '' },
+		google:        { keyLabel: 'Google Translate API Key', keyPlaceholder: 'AIza...' },
+		deepl:         { keyLabel: 'DeepL API Key', keyPlaceholder: 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx:fx' },
+		libretranslate:{ keyLabel: 'API Key (optional)', keyPlaceholder: 'Leave blank for open instances' },
+	};
 
 	const activeProvider = $derived(providerLabels[provider] ?? providerLabels['google']);
 
@@ -64,7 +68,7 @@
 		if (!canSave || saving) return;
 		saving = true;
 		errorMsg = '';
-		const err = await onSave(provider, apiKey.trim());
+		const err = await onSave(provider, apiKey.trim(), isLibreTranslate ? libretranslateUrl.trim() : undefined);
 		saving = false;
 		if (err) errorMsg = err;
 	}
@@ -151,7 +155,23 @@
 					</select>
 				</div>
 
-				<!-- API key input -->
+				<!-- LibreTranslate: base URL field -->
+			{#if isLibreTranslate}
+				<div class="space-y-1.5">
+					<label for="libre-url-input" class="block text-sm text-foreground-dim">API Endpoint</label>
+					<input
+						id="libre-url-input"
+						type="url"
+						bind:value={libretranslateUrl}
+						placeholder="https://libretranslate.com/translate"
+						class="w-full bg-background border border-border/60 text-foreground-bright text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:border-primary-hover transition-colors placeholder:text-foreground-ghost"
+					/>
+					<p class="text-xs text-foreground-subtle">Use the public instance or your self-hosted URL.</p>
+				</div>
+			{/if}
+
+			<!-- API key input -->
+			{#if needsApiKey || isLibreTranslate}
 				<div class="space-y-1.5">
 					<label for="api-key-input" class="block text-sm text-foreground-dim">
 						{activeProvider.keyLabel}
@@ -183,9 +203,18 @@
 						</button>
 					</div>
 					<p class="text-xs text-foreground-subtle">
-						Your key is saved only in your browser's local storage — it is never sent to or stored on our servers.
+						{#if isLibreTranslate}
+							Required only for restricted instances. Saved only in your browser.
+						{:else}
+							Your key is saved only in your browser's local storage — it is never sent to or stored on our servers.
+						{/if}
 					</p>
 				</div>
+			{:else}
+				<div class="rounded-lg bg-primary-muted border border-primary/20 px-4 py-3 text-sm text-foreground-dim">
+					No API key required. Translations are sent directly to Google's public endpoint — no account needed.
+				</div>
+			{/if}
 			</div>
 
 			<!-- Footer -->

@@ -33,6 +33,8 @@ export function createTranslateHandler(state: AppState) {
 
 		state.folderPath = state.pendingFolderName;
 		state.translating = true;
+		state.paused = false;
+		state.stopped = false;
 		state.translatedContents.clear();
 		state.fileMap.clear();
 		state.xmlFiles = [];
@@ -61,6 +63,12 @@ export function createTranslateHandler(state: AppState) {
 
 		// ── Phase 2: translate sequentially ──────────────────────────────────
 		for (const entry of state.xmlFiles) {
+			// Wait while paused, abort if stopped
+			while (state.paused && !state.stopped) {
+				await new Promise((r) => setTimeout(r, 100));
+			}
+			if (state.stopped) break;
+
 			const file = state.fileMap.get(entry.name);
 			if (!file) continue;
 
@@ -78,14 +86,21 @@ export function createTranslateHandler(state: AppState) {
 				}
 
 				const allTranslations: TranslationItem[] = [];
+				let stoppedMidFile = false;
 
 				for (let i = 0; i < allItems.length; i += BATCH_SIZE) {
+					// Wait while paused, abort if stopped
+					while (state.paused && !state.stopped) {
+						await new Promise((r) => setTimeout(r, 100));
+					}
+					if (state.stopped) { stoppedMidFile = true; break; }
+
 					const batch = allItems.slice(i, i + BATCH_SIZE);
 
 					const res = await fetch('/api/translate', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify({ items: batch, filename: entry.name, apiKey: state.apiKey, provider: state.provider }),
+						body: JSON.stringify({ items: batch, filename: entry.name, apiKey: state.apiKey, provider: state.provider, baseUrl: state.libretranslateUrl }),
 					});
 
 					if (!res.ok) {
@@ -98,6 +113,11 @@ export function createTranslateHandler(state: AppState) {
 					state.updateFile(entry.name, { translatedStrings: allTranslations.length });
 				}
 
+				if (stoppedMidFile) {
+					state.updateFile(entry.name, { status: 'pending', translatedStrings: 0 });
+					break;
+				}
+
 				state.translatedContents.set(entry.name, substituteCdata(xml, allTranslations));
 				state.updateFile(entry.name, { status: 'done', translatedStrings: allItems.length });
 			} catch (e) {
@@ -108,6 +128,7 @@ export function createTranslateHandler(state: AppState) {
 		}
 
 		state.translating = false;
+		state.paused = false;
 	}
 
 	return { handleConfirm };

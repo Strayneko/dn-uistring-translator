@@ -23,23 +23,27 @@ export function createSettingsHandlers(state: AppState) {
 	 * @param apiKey    The user's API key for the chosen provider.
 	 * @returns `null` on success, or an error message string on failure.
 	 */
-	async function handleSaveSettings(provider: string, apiKey: string): Promise<string | null> {
-		try {
-			const res = await fetch('/api/translate', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ items: [{ id: 1, text: 'test' }], filename: 'validation', apiKey, provider }),
-			});
+	async function handleSaveSettings(provider: string, apiKey: string, baseUrl?: string): Promise<string | null> {
+		const skipValidation = provider === 'google-free' || (provider === 'libretranslate' && !apiKey.trim());
 
-			if (!res.ok) {
-				const body = await res.json().catch(() => null);
-				return body?.message ?? res.statusText;
+		if (!skipValidation) {
+			try {
+				const res = await fetch('/api/translate', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ items: [{ id: 1, text: 'test' }], filename: 'validation', apiKey, provider, baseUrl }),
+				});
+
+				if (!res.ok) {
+					const body = await res.json().catch(() => null);
+					return body?.message ?? res.statusText;
+				}
+			} catch {
+				return 'Could not reach the translation service. Check your connection.';
 			}
-		} catch {
-			return 'Could not reach the translation service. Check your connection.';
 		}
 
-		state.saveSettings(provider, apiKey);
+		state.saveSettings(provider, apiKey, baseUrl);
 		return null;
 	}
 

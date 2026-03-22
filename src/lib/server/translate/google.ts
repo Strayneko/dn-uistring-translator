@@ -1,4 +1,5 @@
 import type { TranslationItem, TranslationProvider } from './types';
+import { withRetry } from './retry';
 
 const ENDPOINT = 'https://translation.googleapis.com/language/translate/v2';
 const BATCH_SIZE = 100; // Google Translate caps at 128 segments per request
@@ -15,7 +16,7 @@ export class GoogleTranslateProvider implements TranslationProvider {
 
 		for (let i = 0; i < items.length; i += BATCH_SIZE) {
 			const batch = items.slice(i, i + BATCH_SIZE);
-			const translated = await this.translateBatch(batch);
+			const translated = await withRetry(() => this.translateBatch(batch));
 			results.push(...translated);
 		}
 
@@ -30,7 +31,7 @@ export class GoogleTranslateProvider implements TranslationProvider {
 				q: items.map((i) => i.text),
 				source: 'zh',
 				target: 'en',
-				format: 'text'
+				format: 'html'
 			})
 		});
 
