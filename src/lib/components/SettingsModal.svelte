@@ -182,9 +182,9 @@
 							{/if}
 						</button>
 					</div>
-					{#if !canClose}
-						<p class="text-xs text-slate-500">Your key is stored locally in your browser and never shared.</p>
-					{/if}
+					<p class="text-xs text-slate-500">
+						Your key is saved only in your browser's local storage — it is never sent to or stored on our servers.
+					</p>
 				</div>
 			</div>
 
