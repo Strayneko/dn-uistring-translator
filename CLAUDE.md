@@ -2,7 +2,7 @@
 
 - **Language**: TypeScript
 - **Package Manager**: npm
-- **Add-ons**: prettier, eslint, tailwindcss, sveltekit-adapter, drizzle, mcp, vitest
+- **Add-ons**: prettier, eslint, tailwindcss, sveltekit-adapter, mcp, vitest
 
 ---
 
@@ -46,6 +46,7 @@ src/
 │           ├── index.ts                  — getProvider(provider, apiKey) routes to correct provider
 │           ├── google.ts                 — Google Translate v2 REST, batched at 100
 │           └── deepl.ts                  — DeepL v2 REST, batched at 50; auto-detects free/paid endpoint
+└── (no database or server env vars — fully client-driven)
 └── routes/
     ├── +page.svelte                      — state wiring only (new AppState + 4 handler factories)
     └── api/translate/
@@ -73,6 +74,7 @@ const { handleOpenSettings, handleSaveSettings } = createSettingsHandlers(state)
 - Header button opens settings with `canClose = true`
 - On save: `handleSaveSettings` sends a test request to `/api/translate`; only calls `state.saveSettings()` if the key is valid
 - `SettingsModal` shows spinner + "Validating…" during check; red error banner if rejected
+- A privacy note below the API key field always informs users the key is stored only in their browser, never on a server
 
 **Translation** — two providers supported:
 - `getProvider(provider, apiKey)` in `index.ts` routes to `GoogleTranslateProvider` or `DeepLProvider`
@@ -91,10 +93,8 @@ const { handleOpenSettings, handleSaveSettings } = createSettingsHandlers(state)
 - `X error(s)` (red) — only shown when `errorCount > 0`
 - `X total` (grey) — all validated files
 
-### Key env vars (see `.env.example`)
-```
-GOOGLE_TRANSLATE_API_KEY=""   # optional — key now comes from client localStorage
-```
+### Key env vars
+None required. `.env` and `.env.example` are intentionally empty — all API keys come from the user's browser localStorage.
 
 ### Commit conventions
 - Simple, descriptive messages — `feat:`, `fix:`, `chore:`, `refactor:`
@@ -106,8 +106,9 @@ GOOGLE_TRANSLATE_API_KEY=""   # optional — key now comes from client localStor
 - All core features complete and working
 - Two translation providers: Google Translate and DeepL
 - Per-user API key stored in localStorage; validated against the API on save; resets when provider is switched
-- Settings modal: unclosable on first run, reopenable via header button
+- Settings modal: unclosable on first run, reopenable via header button; privacy note always visible below key field
 - Folder selector supports click-to-browse and drag-and-drop
+- No database, no server env vars — fully client-driven
 - Codebase fully refactored: SOLID components, typed handlers, reactive state class, pure XML utilities
 - No pending tasks
 
